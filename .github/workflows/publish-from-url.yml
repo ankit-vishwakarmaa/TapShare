@@ -1,0 +1,43 @@
+name: Publish APK Release
+
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-from-url.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download staged APK
+        run: |
+          curl -fsSL -o TapShare-debug.apk \
+            "https://tmpfiles.org/dl/1795248838.a967914f785f49be/weAcbn06TgsT/tapshare-debug.apk"
+          ls -lh TapShare-debug.apk
+          file TapShare-debug.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: TapShare v1.0.0
+          body: |
+            ## TapShare debug APK
+
+            NFC tap-to-share for Android. Install on two NFC phones.
+
+            1. Allow install from unknown sources
+            2. Install on both phones
+            3. Receiver: Ready to receive
+            4. Sender: Send a file then tap phones together
+
+            **Download:** https://github.com/ankit-vishwakarmaa/TapShare/releases/download/v1.0.0/TapShare-debug.apk
+          files: TapShare-debug.apk
+          fail_on_unmatched_files: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
